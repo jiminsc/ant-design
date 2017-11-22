@@ -1,25 +1,22 @@
 import React from 'react';
+import { findDOMNode } from 'react-dom';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import PureRenderMixin from 'rc-util/lib/PureRenderMixin';
-import Row from '../row';
-import Col from '../col';
+import Row from '../grid/row';
+import Col, { ColProps } from '../grid/col';
 import { WrappedFormUtils } from './Form';
 import { FIELD_META_PROP } from './constants';
 import warning from '../_util/warning';
-
-export interface FormItemLabelColOption {
-  span: number;
-  offset?: number;
-}
 
 export interface FormItemProps {
   prefixCls?: string;
   id?: string;
   label?: React.ReactNode;
-  labelCol?: FormItemLabelColOption;
-  wrapperCol?: FormItemLabelColOption;
+  labelCol?: ColProps;
+  wrapperCol?: ColProps;
   help?: React.ReactNode;
-  extra?: string;
+  extra?: React.ReactNode;
   validateStatus?: 'success' | 'warning' | 'error' | 'validating';
   hasFeedback?: boolean;
   className?: string;
@@ -41,22 +38,22 @@ export default class FormItem extends React.Component<FormItemProps, any> {
   };
 
   static propTypes = {
-    prefixCls: React.PropTypes.string,
-    label: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.node]),
-    labelCol: React.PropTypes.object,
-    help: React.PropTypes.oneOfType([React.PropTypes.node, React.PropTypes.bool]),
-    validateStatus: React.PropTypes.oneOf(['', 'success', 'warning', 'error', 'validating']),
-    hasFeedback: React.PropTypes.bool,
-    wrapperCol: React.PropTypes.object,
-    className: React.PropTypes.string,
-    id: React.PropTypes.string,
-    children: React.PropTypes.node,
-    colon: React.PropTypes.bool,
+    prefixCls: PropTypes.string,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    labelCol: PropTypes.object,
+    help: PropTypes.oneOfType([PropTypes.node, PropTypes.bool]),
+    validateStatus: PropTypes.oneOf(['', 'success', 'warning', 'error', 'validating']),
+    hasFeedback: PropTypes.bool,
+    wrapperCol: PropTypes.object,
+    className: PropTypes.string,
+    id: PropTypes.string,
+    children: PropTypes.node,
+    colon: PropTypes.bool,
   };
 
   static contextTypes = {
-    form: React.PropTypes.object,
-    vertical: React.PropTypes.bool,
+    form: PropTypes.object,
+    vertical: PropTypes.bool,
   };
 
   context: FormItemContext;
@@ -65,7 +62,7 @@ export default class FormItem extends React.Component<FormItemProps, any> {
     warning(
       this.getControls(this.props.children, true).length <= 1,
       '`Form.Item` cannot generate `validateStatus` and `help` automatically, ' +
-      'while there are more than one `getFieldDecorator` in it.'
+      'while there are more than one `getFieldDecorator` in it.',
     );
   }
 
@@ -92,7 +89,8 @@ export default class FormItem extends React.Component<FormItemProps, any> {
       }
 
       const child = childrenArray[i] as React.ReactElement<any>;
-      if (child.type as any === FormItem) {
+      if (child.type &&
+          (child.type as any === FormItem || (child.type as any).displayName === 'FormItem')) {
         continue;
       }
       if (!child.props) {
@@ -172,12 +170,12 @@ export default class FormItem extends React.Component<FormItemProps, any> {
     if (validateStatus) {
       classes = classNames(
         {
-          'has-feedback': props.hasFeedback,
+          'has-feedback': props.hasFeedback || validateStatus === 'validating',
           'has-success': validateStatus === 'success',
           'has-warning': validateStatus === 'warning',
           'has-error': validateStatus === 'error',
           'is-validating': validateStatus === 'validating',
-        }
+        },
       );
     }
     return (
@@ -188,9 +186,13 @@ export default class FormItem extends React.Component<FormItemProps, any> {
   }
 
   renderWrapper(children) {
-    const wrapperCol = this.props.wrapperCol;
+    const { prefixCls, wrapperCol } = this.props;
+    const className = classNames(
+      `${prefixCls}-item-control-wrapper`,
+      wrapperCol && wrapperCol.className,
+    );
     return (
-      <Col className={`${this.props.prefixCls}-item-control-wrapper`} {...wrapperCol} key="wrapper">
+      <Col {...wrapperCol} className={className} key="wrapper">
         {children}
       </Col>
     );
@@ -212,28 +214,53 @@ export default class FormItem extends React.Component<FormItemProps, any> {
     return false;
   }
 
+  // Resolve duplicated ids bug between different forms
+  // https://github.com/ant-design/ant-design/issues/7351
+  onLabelClick = (e) => {
+    const id = this.props.id || this.getId();
+    if (!id) {
+      return;
+    }
+    const controls = document.querySelectorAll(`[id="${id}"]`);
+    if (controls.length !== 1) {
+      e.preventDefault();
+      const control = findDOMNode(this).querySelector(`[id="${id}"]`) as HTMLElement;
+      if (control && control.focus) {
+        control.focus();
+      }
+    }
+  }
+
   renderLabel() {
-    const props = this.props;
+    const { prefixCls, label, labelCol, colon, id } = this.props;
     const context = this.context;
-    const labelCol = props.labelCol;
     const required = this.isRequired();
 
-    const className = classNames({
-      [`${props.prefixCls}-item-required`]: required,
+    const labelColClassName = classNames(
+      `${prefixCls}-item-label`,
+      labelCol && labelCol.className,
+    );
+    const labelClassName = classNames({
+      [`${prefixCls}-item-required`]: required,
     });
 
-    let label = props.label;
+    let labelChildren = label;
     // Keep label is original where there should have no colon
-    const haveColon = props.colon && !context.vertical;
+    const haveColon = colon && !context.vertical;
     // Remove duplicated user input colon
     if (haveColon && typeof label === 'string' && (label as string).trim() !== '') {
-      label = (props.label as string).replace(/[：|:]\s*$/, '');
+      labelChildren = (label as string).replace(/[：|:]\s*$/, '');
     }
 
-    return props.label ? (
-      <Col {...labelCol} key="label" className={`${props.prefixCls}-item-label`}>
-        <label htmlFor={props.id || this.getId()} className={className}>
-          {label}
+    return label ? (
+      <Col {...labelCol} className={labelColClassName} key="label">
+        <label
+          htmlFor={id || this.getId()}
+          className={labelClassName}
+          title={typeof label === 'string' ? label : ''}
+          onClick={this.onLabelClick}
+        >
+          {labelChildren}
         </label>
       </Col>
     ) : null;
@@ -253,8 +280,8 @@ export default class FormItem extends React.Component<FormItemProps, any> {
         this.renderValidateWrapper(
           children,
           this.renderHelp(),
-          this.renderExtra()
-        )
+          this.renderExtra(),
+        ),
       ),
     ];
   }

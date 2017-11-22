@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Animate from 'rc-animate';
 import ScrollNumber from './ScrollNumber';
 import classNames from 'classnames';
@@ -6,13 +7,15 @@ import warning from '../_util/warning';
 
 export interface BadgeProps {
   /** Number to show in badge */
-  count: number | string;
+  count?: number | string;
+  showZero?: boolean;
   /** Max count to show */
   overflowCount?: number;
   /** whether to show red dot without number */
   dot?: boolean;
   style?: React.CSSProperties;
   prefixCls?: string;
+  scrollNumberPrefixCls?: string;
   className?: string;
   status?: 'success' | 'processing' | 'default' | 'error' | 'warning';
   text?: string;
@@ -21,31 +24,48 @@ export interface BadgeProps {
 export default class Badge extends React.Component<BadgeProps, any> {
   static defaultProps = {
     prefixCls: 'ant-badge',
+    scrollNumberPrefixCls: 'ant-scroll-number',
     count: null,
+    showZero: false,
     dot: false,
     overflowCount: 99,
   };
 
   static propTypes = {
-    count: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    count: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]),
-    dot: React.PropTypes.bool,
-    overflowCount: React.PropTypes.number,
+    showZero: PropTypes.bool,
+    dot: PropTypes.bool,
+    overflowCount: PropTypes.number,
   };
 
   render() {
-    const { count, prefixCls, overflowCount, className, style, children, dot, status, text, ...restProps } = this.props;
+    const {
+      count,
+      showZero,
+      prefixCls,
+      scrollNumberPrefixCls,
+      overflowCount,
+      className,
+      style,
+      children,
+      dot,
+      status,
+      text,
+      ...restProps,
+    } = this.props;
     const isDot = dot || status;
-    let displayCount = count > overflowCount ? `${overflowCount}+` : count;
+    let displayCount = (count as number) > (overflowCount as number) ? `${overflowCount}+` : count;
     // dot mode don't need count
     if (isDot) {
       displayCount = '';
     }
 
-    // null undefined "" "0" 0
-    const hidden = (!displayCount || displayCount === '0') && !isDot;
+    const isZero = displayCount === '0' || displayCount === 0;
+    const isEmpty = displayCount === null || displayCount === undefined || displayCount === '';
+    const hidden = (isEmpty || (isZero && !showZero)) && !isDot;
     const scrollNumberCls = classNames({
       [`${prefixCls}-dot`]: isDot,
       [`${prefixCls}-count`]: !isDot,
@@ -57,7 +77,7 @@ export default class Badge extends React.Component<BadgeProps, any> {
 
     warning(
       !(children && status),
-      '`Badge[children]` and `Badge[status]` cannot be used at the same time.'
+      '`Badge[children]` and `Badge[status]` cannot be used at the same time.',
     );
     // <Badge status="success" />
     if (!children && status) {
@@ -75,9 +95,11 @@ export default class Badge extends React.Component<BadgeProps, any> {
 
     const scrollNumber = hidden ? null : (
       <ScrollNumber
+        prefixCls={scrollNumberPrefixCls}
         data-show={!hidden}
         className={scrollNumberCls}
         count={displayCount}
+        title={count}
         style={style}
       />
     );
@@ -87,7 +109,7 @@ export default class Badge extends React.Component<BadgeProps, any> {
     );
 
     return (
-      <span {...restProps} className={badgeCls} title={count as string}>
+      <span {...restProps} className={badgeCls}>
         {children}
         <Animate
           component=""

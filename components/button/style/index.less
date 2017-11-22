@@ -5,15 +5,22 @@
 @btn-prefix-cls: ~"@{ant-prefix}-btn";
 
 // for compatibile
-@btn-ghost-color        : @text-color;
-@btn-ghost-bg           : transparent;
-@btn-ghost-border       : @border-color-base;
+@btn-ghost-color: @text-color;
+@btn-ghost-bg: transparent;
+@btn-ghost-border: @border-color-base;
 
 // Button styles
 // -----------------------------
 .@{btn-prefix-cls} {
   .btn;
   .btn-default;
+
+  // Make sure that the target of Button's click event always be `button`
+  // Ref: https://github.com/ant-design/ant-design/issues/7034
+  > i,
+  > span {
+    pointer-events: none;
+  }
 
   &-primary {
     .btn-primary;
@@ -78,21 +85,24 @@
     display: none;
   }
 
+  .@{iconfont-css-prefix} {
+    transition: margin-left .3s @ease-in-out;
+  }
+
   &&-loading:before {
     display: block;
   }
 
-  &&-loading:not(&-circle):not(&-circle-outline) {
+  &&-loading:not(&-circle):not(&-circle-outline):not(&-icon-only) {
     padding-left: 29px;
     pointer-events: none;
     position: relative;
     .@{iconfont-css-prefix} {
       margin-left: -14px;
-      transition: all .3s @ease-in-out;
     }
   }
 
-  &-sm&-loading:not(&-circle):not(&-circle-outline) {
+  &-sm&-loading:not(&-circle):not(&-circle-outline):not(&-icon-only) {
     padding-left: 24px;
     .@{iconfont-css-prefix} {
       margin-left: -17px;
@@ -106,6 +116,12 @@
   &:not(&-circle):not(&-circle-outline)&-icon-only {
     padding-left: 8px;
     padding-right: 8px;
+  }
+
+  // http://stackoverflow.com/a/21281554/3040605
+  &:focus > span,
+  &:active > span {
+    position: relative;
   }
 
   // To ensure that a space will be placed between character and `Icon`.
@@ -124,22 +140,26 @@
     border-radius: inherit;
     border: 0 solid @primary-color;
     opacity: 0.4;
-    animation: buttonEffect 0.48s ease-in-out forwards;
+    animation: buttonEffect .4s;
     display: block;
   }
 
   &-danger&-clicked:after {
-    border-color: @btn-danger-bg;
+    border-color: @btn-danger-color;
   }
 
   &-background-ghost {
-    background: transparent!important;
+    background: transparent !important;
     border-color: #fff;
     color: #fff;
   }
 
   &-background-ghost&-primary {
-    .button-variant-other(@primary-color; transparent; @primary-color);
+    .button-variant-ghost(@primary-color);
+  }
+
+  &-background-ghost&-danger {
+    .button-variant-ghost(@btn-danger-color);
   }
 }
 

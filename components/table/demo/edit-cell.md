@@ -36,32 +36,34 @@ class EditableCell extends React.Component {
   }
   render() {
     const { value, editable } = this.state;
-    return (<div className="editable-cell">
-      {
-        editable ?
-        <div className="editable-cell-input-wrapper">
-          <Input
-            value={value}
-            onChange={this.handleChange}
-            onPressEnter={this.check}
-          />
-          <Icon
-            type="check"
-            className="editable-cell-icon-check"
-            onClick={this.check}
-          />
-        </div>
-        :
-        <div className="editable-cell-text-wrapper">
-          {value || ' '}
-          <Icon
-            type="edit"
-            className="editable-cell-icon"
-            onClick={this.edit}
-          />
-        </div>
-      }
-    </div>);
+    return (
+      <div className="editable-cell">
+        {
+          editable ?
+            <div className="editable-cell-input-wrapper">
+              <Input
+                value={value}
+                onChange={this.handleChange}
+                onPressEnter={this.check}
+              />
+              <Icon
+                type="check"
+                className="editable-cell-icon-check"
+                onClick={this.check}
+              />
+            </div>
+            :
+            <div className="editable-cell-text-wrapper">
+              {value || ' '}
+              <Icon
+                type="edit"
+                className="editable-cell-icon"
+                onClick={this.edit}
+              />
+            </div>
+        }
+      </div>
+    );
   }
 }
 
@@ -72,10 +74,10 @@ class EditableTable extends React.Component {
       title: 'name',
       dataIndex: 'name',
       width: '30%',
-      render: (text, record, index) => (
+      render: (text, record) => (
         <EditableCell
           value={text}
-          onChange={this.onCellChange(index, 'name')}
+          onChange={this.onCellChange(record.key, 'name')}
         />
       ),
     }, {
@@ -87,11 +89,11 @@ class EditableTable extends React.Component {
     }, {
       title: 'operation',
       dataIndex: 'operation',
-      render: (text, record, index) => {
+      render: (text, record) => {
         return (
           this.state.dataSource.length > 1 ?
           (
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(index)}>
+            <Popconfirm title="Sure to delete?" onConfirm={() => this.onDelete(record.key)}>
               <a href="#">Delete</a>
             </Popconfirm>
           ) : null
@@ -114,17 +116,19 @@ class EditableTable extends React.Component {
       count: 2,
     };
   }
-  onCellChange = (index, key) => {
+  onCellChange = (key, dataIndex) => {
     return (value) => {
       const dataSource = [...this.state.dataSource];
-      dataSource[index][key] = value;
-      this.setState({ dataSource });
+      const target = dataSource.find(item => item.key === key);
+      if (target) {
+        target[dataIndex] = value;
+        this.setState({ dataSource });
+      }
     };
   }
-  onDelete = (index) => {
+  onDelete = (key) => {
     const dataSource = [...this.state.dataSource];
-    dataSource.splice(index, 1);
-    this.setState({ dataSource });
+    this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
   }
   handleAdd = () => {
     const { count, dataSource } = this.state;
@@ -142,10 +146,12 @@ class EditableTable extends React.Component {
   render() {
     const { dataSource } = this.state;
     const columns = this.columns;
-    return (<div>
-      <Button className="editable-add-btn" onClick={this.handleAdd}>Add</Button>
-      <Table bordered dataSource={dataSource} columns={columns} />
-    </div>);
+    return (
+      <div>
+        <Button className="editable-add-btn" onClick={this.handleAdd}>Add</Button>
+        <Table bordered dataSource={dataSource} columns={columns} />
+      </div>
+    );
   }
 }
 
@@ -189,7 +195,7 @@ ReactDOM.render(<EditableTable />, mountNode);
 
 .editable-cell-icon:hover,
 .editable-cell-icon-check:hover {
-  color:#2db7f5;
+  color: #108ee9;
 }
 
 .editable-add-btn {

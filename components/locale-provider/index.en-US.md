@@ -11,7 +11,6 @@ title: LocaleProvider
 
 `LocaleProvider` takes use of [context](https://facebook.github.io/react/docs/context.html), a feature of React, to accomplish global effectiveness by wrapping the app only once.
 
-
 ```jsx
 import { LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
@@ -21,7 +20,17 @@ import enUS from 'antd/lib/locale-provider/en_US';
 return <LocaleProvider locale={enUS}><App /></LocaleProvider>;
 ```
 
-We provide some locale like English, Chinese, Russion, German, French and etc, all locale packages can be found in [here](https://github.com/ant-design/ant-design/blob/master/components/locale-provider/).
+We provide some locale like English, Chinese, Russian, German, French and etc, all locale packages can be found in [here](https://github.com/ant-design/ant-design/blob/master/components/locale-provider/).
+
+Note: if you need to use antd's UMD dist file, please import `antd/dist/antd-with-locales.js`:
+
+```jsx
+const { LocaleProvider, locales } = window.antd;
+
+...
+
+return <LocaleProvider locale={locales.en_US}><App /></LocaleProvider>;
+```
 
 ### Add a new language
 
@@ -33,6 +42,6 @@ This component aims for localization of the built-in text, if you want to suppor
 
 ## API
 
-Property | Description | Type | Default
------|-----|-----|------
-locale | language package setting, you can find the packages in this path: `antd/lib/locale-provider/` | object | -
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| locale | language package setting, you can find the packages in this path: `antd/lib/locale-provider/` | object | - |

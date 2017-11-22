@@ -49,12 +49,12 @@ function dateCellRender(value) {
   return (
     <ul className="events">
       {
-        listData.map(item =>
+        listData.map(item => (
           <li key={item.content}>
             <span className={`event-${item.type}`}>●</span>
             {item.content}
           </li>
-        )
+        ))
       }
     </ul>
   );
@@ -68,10 +68,12 @@ function getMonthData(value) {
 
 function monthCellRender(value) {
   const num = getMonthData(value);
-  return num ? <div className="notes-month">
-    <section>{num}</section>
-    <span>Backlog number</span>
-  </div> : null;
+  return num ? (
+    <div className="notes-month">
+      <section>{num}</section>
+      <span>Backlog number</span>
+    </div>
+  ) : null;
 }
 
 ReactDOM.render(

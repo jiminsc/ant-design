@@ -1,5 +1,6 @@
 import React from 'react';
-import { changeConfirmLocale } from '../modal/locale';
+import PropTypes from 'prop-types';
+import { ModalLocale, changeConfirmLocale } from '../modal/locale';
 
 export interface LocaleProviderProps {
   locale: {
@@ -8,21 +9,22 @@ export interface LocaleProviderProps {
     TimePicker?: Object,
     Calendar?: Object,
     Table?: Object,
-    Modal?: Object,
+    Modal?: ModalLocale,
     Popconfirm?: Object,
     Transfer?: Object,
     Select?: Object,
+    Upload?: Object,
   };
   children?: React.ReactElement<any>;
 }
 
 export default class LocaleProvider extends React.Component<LocaleProviderProps, any> {
   static propTypes = {
-    locale: React.PropTypes.object,
+    locale: PropTypes.object,
   };
 
   static childContextTypes = {
-    antLocale: React.PropTypes.object,
+    antLocale: PropTypes.object,
   };
 
   getChildContext() {
@@ -34,7 +36,7 @@ export default class LocaleProvider extends React.Component<LocaleProviderProps,
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.componentDidUpdate();
   }
 

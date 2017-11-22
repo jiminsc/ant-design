@@ -1,14 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import assign from 'object-assign';
 import Icon from '../icon';
 import Dialog from './Modal';
 import ActionButton from './ActionButton';
 import { getConfirmLocale } from './locale';
 
 export default function confirm(config) {
-  const props = assign({ iconType: 'question-circle' }, config);
+  const props = {
+    iconType: 'question-circle',
+    okType: 'primary',
+    ...config,
+  };
   const prefixCls = props.prefixCls || 'ant-confirm';
   let div = document.createElement('div');
   document.body.appendChild(div);
@@ -30,10 +33,15 @@ export default function confirm(config) {
     (props.okCancel ? runtimeLocale.okText : runtimeLocale.justOkText);
   props.cancelText = props.cancelText || runtimeLocale.cancelText;
 
-  function close() {
+  function close(...args) {
     const unmountResult = ReactDOM.unmountComponentAtNode(div);
     if (unmountResult && div.parentNode) {
       div.parentNode.removeChild(div);
+    }
+    const triggerCancel = args && args.length &&
+      args.some(param => param && param.triggerCancel);
+    if (props.onCancel && triggerCancel) {
+      props.onCancel(...args);
     }
   }
 
@@ -52,7 +60,7 @@ export default function confirm(config) {
         <ActionButton actionFn={props.onCancel} closeModal={close}>
           {props.cancelText}
         </ActionButton>
-        <ActionButton type="primary" actionFn={props.onOk} closeModal={close} autoFocus>
+        <ActionButton type={props.okType} actionFn={props.onOk} closeModal={close} autoFocus>
           {props.okText}
         </ActionButton>
       </div>
@@ -60,7 +68,7 @@ export default function confirm(config) {
   } else {
     footer = (
       <div className={`${prefixCls}-btns`}>
-        <ActionButton type="primary" actionFn={props.onOk} closeModal={close} autoFocus>
+        <ActionButton type={props.okType} actionFn={props.onOk} closeModal={close} autoFocus>
           {props.okText}
         </ActionButton>
       </div>
@@ -74,7 +82,7 @@ export default function confirm(config) {
   ReactDOM.render(
     <Dialog
       className={classString}
-      onCancel={close}
+      onCancel={close.bind(this, { triggerCancel: true })}
       visible
       title=""
       transitionName="zoom"
@@ -83,6 +91,7 @@ export default function confirm(config) {
       maskClosable={maskClosable}
       style={style}
       width={width}
+      zIndex={props.zIndex}
     >
       <div className={`${prefixCls}-body-wrapper`}>
         {body} {footer}

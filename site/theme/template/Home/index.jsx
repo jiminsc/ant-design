@@ -30,12 +30,19 @@ function getStyle() {
       border-bottom: 1px solid transparent;
       transition: border .5s cubic-bezier(0.455, 0.03, 0.515, 0.955), background .5s cubic-bezier(0.455, 0.03, 0.515, 0.955);
     }
+    #header .header-lang-button {
+      color: #fff;
+      border-color: #fff;
+    }
     #header .ant-select-selection,
     #header .ant-menu {
       background: transparent;
     }
     #header .ant-select-search__field {
       color: #eee;
+    }
+    #header .ant-select-arrow {
+      color: #fff;
     }
     #header .ant-select-selection__placeholder {
       color: rgba(255,255,255,0.57);
@@ -48,23 +55,26 @@ function getStyle() {
     }
     #header.home-nav-white {
       background: rgba(255, 255, 255, 0.91);
-      border-bottom-color: #EBEDEE;
+      border-bottom-color: #ebedee;
     }
     .home-nav-white #search-box {
-      border-left-color: #EBEDEE;
+      border-left-color: #ebedee;
     }
     .home-nav-white #nav a {
       color: rgba(0, 0, 0, 0.65);
     }
-    .home-nav-white .lang:not(:hover) {
+    #header.home-nav-white .header-lang-button:not(:hover) {
       color: rgba(0, 0, 0, 0.65);
-      border-color: rgba(0, 0, 0, 0.65);
+      border-color: #d9d9d9;
     }
-    .home-nav-white .version > .ant-select-selection {
+    #header.home-nav-white .version > .ant-select-selection {
       color: rgba(0, 0, 0, 0.65);
     }
-    .home-nav-white .version > .ant-select-selection:not(:hover) {
-      border-color: rgba(0, 0, 0, 0.65);
+    #header.home-nav-white .version > .ant-select-selection:not(:hover) {
+      border-color: #d9d9d9;
+    }
+    #header.home-nav-white .version .ant-select-arrow {
+      color: rgba(0, 0, 0, 0.45);
     }
     .nav-phone-icon:before {
       background: #eee;
@@ -80,6 +90,12 @@ function getStyle() {
       color: #eee;
       transition: all 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955);
     }
+    #nav a.header-link {
+      color: #fff;
+    }
+    .home-nav-white #nav a.header-link {
+      color: rgba(0, 0, 0, .65);
+    }
     #search-box {
       border-left-color: rgba(235, 237, 238, .5);
       transition: border 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955);
@@ -93,9 +109,6 @@ function getStyle() {
     }
     #footer a {
       color: #eee;
-    }
-    .down {
-      animation: upDownMove 1.2s ease-in-out infinite;
     }
   `;
 }

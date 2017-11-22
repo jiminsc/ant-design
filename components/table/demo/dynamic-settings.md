@@ -1,5 +1,5 @@
 ---
-order: 24
+order: 25
 title:
   en-US: Dynamic Settings
   zh-CN: 动态控制表格属性
@@ -91,7 +91,7 @@ class Demo extends React.Component {
   }
 
   handleExpandChange = (enable) => {
-    this.setState({ expandedRowRender: enable ? expandedRowRender : false });
+    this.setState({ expandedRowRender: enable ? expandedRowRender : undefined });
   }
 
   handleTitleChange = (enable) => {
@@ -119,7 +119,7 @@ class Demo extends React.Component {
     return (
       <div>
         <div className="components-table-demo-control-bar">
-          <Form inline>
+          <Form layout="inline">
             <FormItem label="Bordered">
               <Switch checked={state.bordered} onChange={this.handleToggle('bordered')} />
             </FormItem>

@@ -18,36 +18,43 @@
     margin-right: 0;
     padding-right: 0;
     .@{progress-prefix-cls}-show-info & {
-      padding-right: 45px;
-      margin-right: -45px;
+      padding-right: 2.75em;
+      margin-right: -2.75em;
     }
   }
 
   &-inner {
     display: inline-block;
     width: 100%;
-    background-color: #f3f3f3;
+    background-color: @progress-remaining-color;
     border-radius: 100px;
     vertical-align: middle;
   }
 
+  &-circle-trail {
+    stroke: @progress-remaining-color;
+  }
+
+  &-circle-path {
+    stroke: @progress-default-color;
+    animation: ~"@{ant-prefix}-progress-appear" .3s;
+  }
+
   &-bg {
     border-radius: 100px;
-    background-color: @process-default-color;
+    background-color: @progress-default-color;
     transition: all .4s @ease-out-circ 0s;
     position: relative;
   }
 
   &-text {
-    width: 35px;
+    word-break: normal;
+    width: 2em;
     text-align: left;
     font-size: 1em;
-    margin-left: 10px;
+    margin-left: 0.75em;
     vertical-align: middle;
     display: inline-block;
-    font-family: tahoma;
-    position: relative;
-    top: -1px;
     .@{iconfont-css-prefix} {
       font-size: @font-size-base;
     }
@@ -75,6 +82,9 @@
     .@{progress-prefix-cls}-text {
       color: @error-color;
     }
+    .@{progress-prefix-cls}-circle-path {
+      stroke: @error-color;
+    }
   }
 
   &-status-success {
@@ -83,6 +93,9 @@
     }
     .@{progress-prefix-cls}-text {
       color: @success-color;
+    }
+    .@{progress-prefix-cls}-circle-path {
+      stroke: @success-color;
     }
   }
 
@@ -118,6 +131,15 @@
     .@{progress-prefix-cls}-text {
       color: @success-color;
     }
+  }
+}
+
+@keyframes ~"@{ant-prefix}-progress-appear" {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 

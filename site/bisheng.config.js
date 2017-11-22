@@ -1,4 +1,8 @@
 const path = require('path');
+const CSSSplitWebpackPlugin = require('css-split-webpack-plugin').default;
+
+const isDev = process.env.NODE_ENV === 'development';
+const usePreact = process.env.REACT_ENV === 'preact';
 
 module.exports = {
   port: 8001,
@@ -14,10 +18,8 @@ module.exports = {
   htmlTemplate: './site/theme/static/template.html',
   themeConfig: {
     categoryOrder: {
-      十大原则: 0,
-      Principles: 0,
-      设计基础: 1,
-      'Design Fundamental': 1,
+      设计原则: 2,
+      Principles: 2,
     },
     typeOrder: {
       General: 0,
@@ -61,6 +63,19 @@ module.exports = {
       'react-router': 'react-router/umd/ReactRouter',
     };
 
+    config.externals = {
+      'react-router-dom': 'ReactRouterDOM',
+    };
+
+    if (usePreact) {
+      config.resolve.alias = Object.assign({}, config.resolve.alias, {
+        react: 'preact-compat',
+        'react-dom': 'preact-compat',
+        'create-react-class': 'preact-compat/lib/create-react-class',
+        'react-router': 'react-router',
+      });
+    }
+
     config.babel.plugins.push([
       require.resolve('babel-plugin-transform-runtime'),
       {
@@ -69,6 +84,13 @@ module.exports = {
       },
     ]);
 
+    config.plugins.push(new CSSSplitWebpackPlugin({ size: 4000 }));
+
     return config;
+  },
+
+  htmlTemplateExtraData: {
+    isDev,
+    usePreact,
   },
 };

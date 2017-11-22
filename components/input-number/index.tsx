@@ -9,12 +9,18 @@ export interface InputNumberProps {
   value?: number;
   step?: number | string;
   defaultValue?: number;
+  onKeyDown?: React.FormEventHandler<any>;
   onChange?: (value: number | string | undefined) => void;
   disabled?: boolean;
   size?: 'large' | 'small' | 'default';
+  formatter?: (value: number | string | undefined) => string;
+  parser?: (displayValue: string | undefined) => number;
   placeholder?: string;
   style?: React.CSSProperties;
   className?: string;
+  name?: string;
+  id?: string;
+  precision?: number;
 }
 
 export default class InputNumber extends React.Component<InputNumberProps, any> {

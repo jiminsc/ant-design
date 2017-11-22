@@ -13,10 +13,12 @@ export default {
   TimePicker,
   Calendar,
   Table: {
-    filterTitle: 'Filter Menu',
+    filterTitle: 'Filter menu',
     filterConfirm: 'OK',
     filterReset: 'Reset',
-    emptyText: 'No Data',
+    emptyText: 'No data',
+    selectAll: 'Select current page',
+    selectInvert: 'Invert current page',
   },
   Modal: {
     okText: 'OK',
@@ -35,5 +37,11 @@ export default {
   },
   Select: {
     notFoundContent: 'Not Found',
+  },
+  Upload: {
+    uploading: 'Uploading...',
+    removeFile: 'Remove file',
+    uploadError: 'Upload error',
+    previewFile: 'Preview file',
   },
 };

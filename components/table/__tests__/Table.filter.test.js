@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, mount } from 'enzyme';
-import { renderToJson } from 'enzyme-to-json';
 import Table from '..';
 
 describe('Table.filter', () => {
@@ -48,13 +47,13 @@ describe('Table.filter', () => {
   it('renders filter correctly', () => {
     const wrapper = render(createTable());
 
-    expect(renderToJson(wrapper)).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders menu correctly', () => {
     const wrapper = mount(createTable());
     const dropdownWrapper = render(wrapper.find('Trigger').node.getComponent());
-    expect(renderToJson(dropdownWrapper)).toMatchSnapshot();
+    expect(dropdownWrapper).toMatchSnapshot();
   });
 
   it('renders radio filter correctly', () => {
@@ -65,7 +64,7 @@ describe('Table.filter', () => {
       }],
     }));
     const dropdownWrapper = render(wrapper.find('Trigger').node.getComponent());
-    expect(renderToJson(dropdownWrapper)).toMatchSnapshot();
+    expect(dropdownWrapper).toMatchSnapshot();
   });
 
   it('renders custom content correctly', () => {
@@ -82,7 +81,7 @@ describe('Table.filter', () => {
     }));
 
     const dropdownWrapper = render(wrapper.find('Trigger').node.getComponent());
-    expect(renderToJson(dropdownWrapper)).toMatchSnapshot();
+    expect(dropdownWrapper).toMatchSnapshot();
   });
 
   it('can be controlled by filterDropdownVisible', () => {
@@ -95,10 +94,12 @@ describe('Table.filter', () => {
     const dropdown = wrapper.find('Dropdown').first();
 
     expect(dropdown.props().visible).toBe(true);
-    wrapper.setProps({ columns: [{
-      ...column,
-      filterDropdownVisible: false,
-    }] });
+    wrapper.setProps({
+      columns: [{
+        ...column,
+        filterDropdownVisible: false,
+      }],
+    });
     expect(dropdown.props().visible).toBe(false);
   });
 
@@ -125,10 +126,12 @@ describe('Table.filter', () => {
     }));
 
     expect(wrapper.find('tbody tr').length).toBe(1);
-    wrapper.setProps({ columns: [{
-      ...column,
-      filteredValue: [],
-    }] });
+    wrapper.setProps({
+      columns: [{
+        ...column,
+        filteredValue: [],
+      }],
+    });
     expect(wrapper.find('tbody tr').length).toBe(4);
   });
 
@@ -141,10 +144,12 @@ describe('Table.filter', () => {
     }));
 
     expect(wrapper.find('tbody tr').length).toBe(1);
-    wrapper.setProps({ columns: [{
-      ...column,
-      filteredValue: null,
-    }] });
+    wrapper.setProps({
+      columns: [{
+        ...column,
+        filteredValue: null,
+      }],
+    });
     expect(wrapper.find('tbody tr').length).toBe(4);
   });
 
@@ -235,5 +240,43 @@ describe('Table.filter', () => {
 
     dropdownWrapper.find('.clear').simulate('click');
     expect(renderedNames(wrapper)).toEqual(['Jack', 'Lucy', 'Tom', 'Jerry']);
+  });
+
+  it('works with grouping columns in controlled mode', () => {
+    const columns = [
+      {
+        title: 'group',
+        key: 'group',
+        children: [
+          {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            filters: [
+              { text: 'Jack', value: 'Jack' },
+              { text: 'Lucy', value: 'Lucy' },
+            ],
+            onFilter: filterFn,
+            filteredValue: ['Jack'],
+          },
+          {
+            title: 'Age',
+            dataIndex: 'age',
+            key: 'age',
+          },
+        ],
+      },
+    ];
+    const testData = [
+      { key: 0, name: 'Jack', age: 11 },
+      { key: 1, name: 'Lucy', age: 20 },
+      { key: 2, name: 'Tom', age: 21 },
+      { key: 3, name: 'Jerry', age: 22 },
+    ];
+    const wrapper = mount(
+      <Table columns={columns} dataSource={testData} />
+    );
+
+    expect(renderedNames(wrapper)).toEqual(['Jack']);
   });
 });
